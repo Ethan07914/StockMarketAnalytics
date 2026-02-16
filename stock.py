@@ -38,18 +38,18 @@ class stock:
         df = pd.DataFrame(self.get_data())
         df['ticker'] = self.ticker
         df['date'] = pd.to_datetime(df['timestamp'], unit='ms').dt.date
-        return df[['ticker', 'date', 'open', 'high', 'low', 'close', 'volume', 'vwap', 'timestamp', 'transactions', 'otc']]
+        df['volume'] = df['volume'].astype(int)
+        return df[['ticker', 'date', 'open', 'high', 'low', 'close', 'volume', 'vwap', 'timestamp', 'transactions']]
         #VWAP (Volume Weighted Average Price)
 
 client = client(config).ConfigureClient()
-tickers = ['AAPL', 'GOOG', 'MSFT', 'AMZN', 'NVDA']
+tickers = ['AAPL', 'GOOG', 'MSFT', 'AMZN']
 for ticker in tickers:
-    stock_data = stock(client, ticker, '1', 'day', '2026-01-13', '2026-02-13')
+    stock_data = stock(client, ticker, '1', 'day', '2026-01-01', '2026-01-31')
     if ticker == tickers[0]:
         data = stock_data.format_data()
     else:
         data = pd.concat([data, stock_data.format_data()])
-print(data)
-stock_data.format_data().to_csv(f'StockPrices_{stock_data.date_from}-{stock_data.date_to}.csv', index=False)
+data.to_csv(f'stock_info_{stock_data.date_from}_{stock_data.date_to}.csv', index=False)
 
 

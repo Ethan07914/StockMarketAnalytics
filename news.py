@@ -47,17 +47,15 @@ class news:
         df = df.apply(self.unnest_insight, axis=1)
         return df[['ticker', 'publisher', 'title', 'author', 'date', 'description', 'sentiment', 'sentiment_reasoning']]
 
-tickers = ['AAPL', 'GOOG', 'MSFT', 'AMZN', 'NVDA']
+tickers = ['AAPL', 'GOOG', 'MSFT', 'AMZN']
 for ticker in tickers:
-    news_data = news(base_url, ticker, 'day', '2026-01-01', '2026-02-01', config.api_key, 'desc')
+    news_data = news(base_url, ticker, 'day', '2026-01-01', '2026-01-31', config.api_key, 'desc')
     if ticker == tickers[0]:
         data = news_data.format_data()
     else:
         data = pd.concat([data, news_data.format_data()])
 data = data.reset_index(drop=True)
-print(data[['ticker', 'sentiment']])
-# data.to_parquet('StockNews.gzip', index=False)
-# parquet = pd.read_parquet('StockNews.gzip')
-# print(parquet.head())
+data.to_csv(f'seed_stock_news_{news_data.date_from}_{news_data.date_to}', index=False)
+
 
 
