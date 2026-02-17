@@ -1,5 +1,5 @@
-with final as (
 select
+       id,
        ticker,
        publisher as publisher_name,
        title,
@@ -7,13 +7,10 @@ select
        date,
        description,
        sentiment,
-       sentiment_reasoning
-from
-       {{ ref('seed_stock_news_2026-01-01_2026-01-31') }}
-)
-
-select
-       *,
+       sentiment_reasoning,
        current_timestamp() as ingestion_timestamp
 from
-       final
+       {{ ref('seed_stock_news_2026-01-01_2026-01-31') }}
+
+
+

@@ -50,6 +50,6 @@ for ticker in tickers:
         data = stock_data.format_data()
     else:
         data = pd.concat([data, stock_data.format_data()])
-data.to_csv(f'stock_info_{stock_data.date_from}_{stock_data.date_to}.csv', index=False)
+# data.to_csv(f'stock_info_{stock_data.date_from}_{stock_data.date_to}.csv', index=False)
 
 

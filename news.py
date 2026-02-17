@@ -38,6 +38,7 @@ class news:
     def format_data(self):
         data = self.get_data()
         articles = []
+        print(data)
         for article in data['results']:
             articles.append(article)
         df = pd.DataFrame(articles)
@@ -45,7 +46,7 @@ class news:
         df['date'] = df['published_utc'].str[:10]
         df['ticker'] = self.ticker
         df = df.apply(self.unnest_insight, axis=1)
-        return df[['ticker', 'publisher', 'title', 'author', 'date', 'description', 'sentiment', 'sentiment_reasoning']]
+        return df[['id', 'ticker', 'publisher', 'title', 'author', 'date', 'description', 'sentiment', 'sentiment_reasoning']]
 
 tickers = ['AAPL', 'GOOG', 'MSFT', 'AMZN']
 for ticker in tickers:
@@ -55,7 +56,7 @@ for ticker in tickers:
     else:
         data = pd.concat([data, news_data.format_data()])
 data = data.reset_index(drop=True)
-data.to_csv(f'seed_stock_news_{news_data.date_from}_{news_data.date_to}', index=False)
+# data.to_csv(f'seed_stock_news_{news_data.date_from}_{news_data.date_to}.csv', index=False)
 
 
 
