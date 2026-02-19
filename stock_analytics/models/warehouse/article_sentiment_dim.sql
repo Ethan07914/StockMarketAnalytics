@@ -1,8 +1,8 @@
 {% set sentiments = ['positive', 'negative', 'neutral'] %}
 
 select
-       {{ dbt_utils.generate_surrogate_key(['id', 'ticker']) }} as article_pk,
-       id,
+       {{ dbt_utils.generate_surrogate_key(['id', 'ticker']) }} as article_sentiment_pk,
+       id as article_id,
        publisher_name,
        author_name,
        title,
