@@ -1,8 +1,8 @@
 from massive import RESTClient
-import config
 from urllib3 import HTTPResponse
 from typing import cast
 import pandas as pd
+
 
 class client:
     def __init__(self, config_file_name):
@@ -38,18 +38,11 @@ class stock:
         df = pd.DataFrame(self.get_data())
         df['ticker'] = self.ticker
         df['date'] = pd.to_datetime(df['timestamp'], unit='ms').dt.date
+        #Convert the timestamp to a date
         df['volume'] = df['volume'].astype(int)
         return df[['ticker', 'date', 'open', 'high', 'low', 'close', 'volume', 'vwap', 'timestamp', 'transactions']]
         #VWAP (Volume Weighted Average Price)
 
-client = client(config).ConfigureClient()
-tickers = ['AAPL', 'GOOG', 'MSFT', 'AMZN']
-for ticker in tickers:
-    stock_data = stock(client, ticker, '1', 'day', '2026-01-01', '2026-01-31')
-    if ticker == tickers[0]:
-        data = stock_data.format_data()
-    else:
-        data = pd.concat([data, stock_data.format_data()])
-# data.to_csv(f'stock_info_{stock_data.date_from}_{stock_data.date_to}.csv', index=False)
+
 
 

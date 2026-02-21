@@ -1,62 +1,56 @@
 import requests
-import config
 import pandas as pd
 
-base_url = "https://api.polygon.io/v2/reference/news"
 
 class news:
-    def __init__(self, url, ticker, interval, date_from, date_to, api_key, order):
+    def __init__(self, url, ticker, interval, date_to, api_key, order, limit=1):
         self.url = url
         self.ticker = ticker
         self.interval = interval
-        self.date_from = date_from
         self.date_to = date_to
         self.api_key = api_key
         self.order = order
+        self.limit = limit
 
     def set_parameters(self):
         parameters = {
             "ticker": self.ticker,
             "interval": self.interval,
-            "date_from": self.date_from,
             "order": self.order,
             "date_to": self.date_to,
+            "limit": self.limit,
             "apiKey": self.api_key
         }
         return parameters
 
     def get_data(self):
-        return requests.get(self.url, self.set_parameters()).json()
+        return requests.get(self.url, self.set_parameters()).json() #Retrieve data from api in json format
 
     def unnest_insight(self, row):
         subframe = pd.DataFrame(row['insights'])
+        #Read dictionary format column into a dataframe
         row['sentiment'] = subframe['sentiment'].loc[subframe['ticker'] == self.ticker].iloc[0]
-        #.iloc[0] prevents the sub data frames index from being included
+        #Save the sentiment column of the sub dataframe for the rows that are equivalent to the current ticker value to the main dataframe
         row['sentiment_reasoning'] = subframe['sentiment_reasoning'].loc[subframe['ticker'] == self.ticker].iloc[0]
+        #Save the associated sentiment reasoning to the sentiment_reasoning column of the main dataframe
         return row
 
     def format_data(self):
         data = self.get_data()
         articles = []
-        print(data)
+        #Inialise empty list
         for article in data['results']:
             articles.append(article)
+            #List of dictionaries
         df = pd.DataFrame(articles)
         df['publisher'] = df.apply(lambda row: row['publisher']['name'], axis=1)
-        df['date'] = df['published_utc'].str[:10]
+        #For each row retrieve the nested publisher->name column and create a publisher column to store the value unnested
+        df['date'] = self.date_to
         df['ticker'] = self.ticker
         df = df.apply(self.unnest_insight, axis=1)
         return df[['id', 'ticker', 'publisher', 'title', 'author', 'date', 'description', 'sentiment', 'sentiment_reasoning']]
 
-tickers = ['AAPL', 'GOOG', 'MSFT', 'AMZN']
-for ticker in tickers:
-    news_data = news(base_url, ticker, 'day', '2026-01-01', '2026-01-31', config.api_key, 'desc')
-    if ticker == tickers[0]:
-        data = news_data.format_data()
-    else:
-        data = pd.concat([data, news_data.format_data()])
-data = data.reset_index(drop=True)
-# data.to_csv(f'seed_stock_news_{news_data.date_from}_{news_data.date_to}.csv', index=False)
+
 
 
 

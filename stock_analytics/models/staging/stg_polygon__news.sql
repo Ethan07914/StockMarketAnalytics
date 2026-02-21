@@ -10,7 +10,7 @@ select
        sentiment_reasoning,
        current_timestamp() as ingestion_timestamp
 from
-       {{ ref('seed_stock_news_2026-01-01_2026-01-31') }}
+       {{ ref('news') }}
 
 
 
