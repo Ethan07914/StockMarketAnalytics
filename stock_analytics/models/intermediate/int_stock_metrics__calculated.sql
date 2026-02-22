@@ -1,3 +1,10 @@
+{{
+config(
+       materialized='incremental',
+       unique_key='stock_metric_pk'
+      )
+}}
+
 with stock as (
 select
         s.date,
@@ -59,6 +66,7 @@ order by ticker, date
 
 final as (
 select
+        {{dbt_utils.generate_surrogate_key(['s.ticker', 's.date'])}} as stock_metric_pk,
         s.ticker,
         s.date,
         s.stock_fk,
@@ -89,7 +97,19 @@ from
 )
 
 select
-       {{dbt_utils.generate_surrogate_key(['ticker', 'date'])}} as stock_metric_pk,
        *,
        current_timestamp() as ingestion_timestamp
 from final
+
+{% if is_incremental() %}
+
+where
+      stock_metric_pk not in (
+                        select
+                               stock_metric_pk
+                        from
+                               {{ this }}
+                       )
+
+{% endif %}
+

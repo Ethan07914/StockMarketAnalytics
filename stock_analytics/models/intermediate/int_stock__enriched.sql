@@ -1,3 +1,10 @@
+{{
+config(
+       materialized='incremental',
+       unique_key='stock_pk'
+      )
+}}
+
 {% set company_dict = {
     "NVDA": "NVIDIA Corp",
     "AAPL": "Apple Inc",
@@ -30,6 +37,7 @@
 with final as (
 select
        distinct
+       {{ dbt_utils.generate_surrogate_key(['ticker']) }} as stock_pk,
        ticker,
        CASE
        {% for ticker, name in company_dict.items() %}
@@ -44,6 +52,19 @@ from
 )
 
 select
-       {{ dbt_utils.generate_surrogate_key(['ticker']) }} as stock_pk,
        *
-from final
+from
+       final
+
+{% if is_incremental() %}
+
+where
+      stock_pk not in (
+                        select
+                               stock_pk
+                        from
+                               {{ this }}
+                       )
+
+{% endif %}
+

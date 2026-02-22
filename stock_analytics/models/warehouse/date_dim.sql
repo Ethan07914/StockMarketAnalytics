@@ -1,3 +1,11 @@
+{{
+config(
+       materialized='incremental',
+       unique_key='date_pk'
+      )
+}}
+
+with final as (
 select
        {{ dbt_utils.generate_surrogate_key(['d']) }} as date_pk,
        d as full_date,
@@ -18,3 +26,21 @@ from
        from
               unnest(generate_date_array('2026-01-01', '2050-01-01', interval 1 day)) as d
        )
+)
+
+select
+       *
+from
+       final
+
+{% if is_incremental() %}
+
+where
+      final.date_pk not in (
+                        select
+                               date_pk
+                        from
+                               {{ this }}
+                       )
+
+{% endif %}

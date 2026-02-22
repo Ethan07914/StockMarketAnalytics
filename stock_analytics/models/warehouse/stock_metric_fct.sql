@@ -1,3 +1,10 @@
+{{
+config(
+       materialized='incremental',
+       unique_key='stock_metric_pk'
+      )
+}}
+
 with stock_metrics as (
 select
        stock_metric_pk,
@@ -62,3 +69,14 @@ select
        current_timestamp() as ingestion_timestamp
 from
        final
+{% if is_incremental() %}
+
+where
+      stock_metric_pk not in (
+                        select
+                               stock_metric_pk
+                        from
+                               {{this }}
+                       )
+
+{% endif %}

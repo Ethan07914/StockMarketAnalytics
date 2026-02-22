@@ -1,3 +1,9 @@
+{{
+config(
+       materialized='incremental'
+      )
+}}
+
 select
        id,
        ticker,
@@ -13,6 +19,17 @@ select
        current_timestamp() as ingestion_timestamp
 from
        {{ source('stocks', 'news') }}
+
+{% if is_incremental() %}
+
+where
+       date > (select
+                      max(date)
+               from
+                      {{ this }}
+              )
+
+{% endif %}
 
 
 
