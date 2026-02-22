@@ -13,7 +13,7 @@ select
        --Number of transactions (a singular transaction often is for multiple stocks)
        current_timestamp() as ingestion_timestamp
 from
-       {{ ref('stock') }}
+       {{ source('stocks', 'stock') }}
 
 
 

@@ -1,5 +1,11 @@
 version: 2
 
+sources:
+  - name: stocks
+    schema: dbt_ethan
+    tables:
+      - name: stock
+      - name: news
 models:
   - name: stg_polygon__news
     description: 'Table that holds the most recent article for each stock on a given day'

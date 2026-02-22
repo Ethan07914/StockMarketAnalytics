@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: article_sentiment_dim
+    description: 'Stores sentiment of text in reference to a stock in an article. One row per article x stock.'
+    data_tests:
+      - fields_equivalent:
+          column_1: is_negative
+          column_2: is_positive
+          column_3: is_neutral
+    columns:
+    - name: article_sentiment_pk
+      description: 'Primary key, unique identifier of a stock reference in an article'
+      data_tests:
+        - not_null
+        - unique
+    - name: article_id
+      description: 'Which article is the stock sentiment from'
+      data_tests:
+        - not_null
+    - name: is_positive
+      description: 'Is the sentiment positive'
+      data_tests:
+        - accepted_values:
+            values: [0,1]
+            quote: false
+    - name: is_negative
+      description: 'Is the sentiment negative'
+      data_tests:
+        - accepted_values:
+            values: [0,1]
+            quote: false
+    - name: is_neutral
+      description: 'Is the sentiment neutral'
+      data_tests:
+        - accepted_values:
+            values: [0,1]
+            quote: false
+  - name: date_dim
+    description: 'Table that stores all date related fields'
+    columns:
+    - name: date_pk
+      description: 'Primary key, identifies a unique date'
+      data_tests:
+        - not_null
+        - unique
+  - name: stock_dim
+    description: 'Table that stores stock related information'
+    columns:
+    - name: stock_pk
+      description: 'Primary key, uniquely identifies a stock traded on the US stock market'
+      data_tests:
+        - not_null
+        - unique
+  - name: stock_metric_fct
+    description: 'Table that stores information about a stock on a specific day'
+    columns:
+    - name: stock_metric_pk
+      description: 'Primary key, unique identifier for a stock on a day'
+      data_tests:
+        - not_null
+        - unique
+    - name: stock_fk
+      description: 'Foreign key, joins to stock_dim table'
+      data_tests:
+        - not_null
+        - relationships:
+            arguments:
+              to: ref('stock_dim')
+              field: stock_pk
+    - name: date_fk
+      description: 'Foreign key, joins to date_dim table'
+      data_tests:
+        - not_null
+        - relationships:
+            arguments:
+              to: ref('date_dim')
+              field: date_pk
+    - name: article_sentiment_fk
+      description: 'Foreign key, joins to article_sentiment_dim table'
+      data_tests:
+        - not_null
+        - relationships:
+            arguments:
+              to: ref('article_sentiment_dim')
+              field: article_sentiment_pk

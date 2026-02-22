@@ -12,7 +12,7 @@ select
        --Text to provide context of assigned sentiment
        current_timestamp() as ingestion_timestamp
 from
-       {{ ref('news') }}
+       {{ source('stocks', 'news') }}
 
 
 
