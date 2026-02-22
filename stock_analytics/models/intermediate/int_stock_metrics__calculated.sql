@@ -22,6 +22,7 @@ highest_price as (
 select
        ticker,
        MAX(close_price) as all_time_max_price
+       --Find the highest all time price by stock
 from
        {{ ref('stg_polygon__stock') }}
 group by
@@ -38,6 +39,7 @@ select
                  OVER (partition by ticker order by date
                  rows between 9 preceding and current row)
                  THEN 1
+                 --Is the previous stock close price the highest it has been in the last 10 days
              ELSE 0
        END AS ten_day_high
 from
@@ -49,6 +51,7 @@ select
        ticker,
        date,
        open_price - lag(close_price) over(partition by ticker order by date) as overnight_return
+       -- Subtract the close price from the previous day to the close price today
 from
        {{ ref('stg_polygon__stock') }} as s
 order by ticker, date
@@ -74,6 +77,7 @@ select
         END AS is_new_high,
         COALESCE(tdph.ten_day_high,1) as is_ten_day_high,
         COALESCE(opc.overnight_return, 0) as overnight_return
+        --Supplement NULL values with zero if stocks where not traded the previous day
 from
         stock as s
         left join highest_price as hp

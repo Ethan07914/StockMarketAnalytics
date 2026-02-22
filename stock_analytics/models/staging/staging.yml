@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: stg_polygon__news
+    description: 'Table that holds the most recent article for each stock on a given day'
+  - name: stg_polygon__stock
+    description: 'Table that holds key information about a stocks performance on a given day'

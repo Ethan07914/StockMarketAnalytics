@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: int_stock__enriched
+    description: 'Table of unique stocks with generated primary key'
+    columns:
+      - name: stock_pk
+        description: 'Primary key, unique identifier of a stock'
+        data_tests:
+          - unique
+          - not_null
+      - name: company_name
+        description: 'Name of the company'
+        data_tests:
+          - not_null
+          - unique
+  - name: int_stock_metrics__calculated
+    description: 'Table which stores which holds additional calculated values regarding a stock'
+    columns:
+      - name: stock_metric_pk
+        description: 'Primary key, unique identifier of a stock on a given day'
+        data_tests:
+          - unique
+          - not_null
+      - name: stock_fk
+        description: 'Foreign key, joins to identifies the stock of the stock metrics'
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_stock__enriched')
+                field: stock_pk
+      - name: max_min_difference
+        description: 'The difference between the maximum and minimum price of a stock on a given day'
+        data_tests:
+          - is_negative
+      - name: is_new_high
+        description: 'Is the most recent close price the highest it has ever been'
+        data_tests:
+          - accepted_values:
+              values: [0,1]
+              quote: false #Forces values to be passed as numbers
+      - name: is_ten_day_high
+        description: 'Is the most recent close price the highest it has been in the last ten days'
+        data_tests:
+          - accepted_values:
+              values: [0,1]
+              quote: false
+
+
