@@ -1,0 +1,7 @@
+pandas
+requests
+massive
+urllib3
+typing
+dbt-core
+dbt-bigquery

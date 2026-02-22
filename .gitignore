@@ -3,3 +3,6 @@ config.py
 __pycache__/
 logs/
 stock_analytics/.gitignore
+stock_analytics/profiles.yml
+stock_analytics/stockanalytics-487517-1bbcbb49beca.json
+stock_analytics/.user.yml
